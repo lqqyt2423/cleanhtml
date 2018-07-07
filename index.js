@@ -13,7 +13,7 @@ const toTextElements = ['span', 'html', 'body'];
 
 // 序列化 attr
 const attrStringify = (attr) => {
-  return '';
+  // return '';
   const a = [];
   Object.keys(attr).forEach((key) => {
     const val = attr[key];
@@ -35,25 +35,51 @@ const attrStringify = (attr) => {
 class Stack {
   constructor() {
     this.stack = [];
-  }
-  in(i) {
-    this.stack.push(i);
-    // console.log(this.stack.join(', '));
+    this.s = [];
+    this.depth = -1;
   }
 
-  out() {
+  in(i) {
+    this.stack.push(i);
+    this.depth += 1;
+  }
+
+  out(s = '') {
     const i = this.stack.pop();
-    // console.log('out:', i);
-    return i;
+    this.depth -= 1;
+
+    i.s.push(s);
+    const str = i.s.join('');
+    if (this.depth === -1) {
+      this.s.push(str);
+    } else {
+      this.stack[this.depth].s.push(str);
+    }
+  }
+
+  add(s = '') {
+    if (!s) return;
+    if (this.depth === -1) {
+      this.s.push(s);
+      return;
+    }
+    this.stack[this.depth].s.push(s);
+  }
+
+  parentIsE(name) {
+    if (this.depth === -1) return false;
+    return this.stack[this.depth].name === name;
+  }
+
+  getStr() {
+    console.log('depth:', this.depth);
+    return this.s.join('');
   }
 }
 
 module.exports = function cleanhtml(html) {
   // 控制 stack
   const stack = new Stack();
-
-  // 最终返回的字符
-  let str = '';
 
   // 控制忽略元素
   const voidObj = {};
@@ -102,7 +128,11 @@ module.exports = function cleanhtml(html) {
       if (name === 'img') {
         let attrString = attrStringify(attr);
         if (attrString) attrString = ` ${attrString}`;
-        str += `<img${attrString} />`;
+
+        stack.in({
+          name,
+          s: [`<img${attrString} />`],
+        });
         return;
       }
 
@@ -110,8 +140,11 @@ module.exports = function cleanhtml(html) {
       if (name === 'a') {
         let attrString = attrStringify(attr);
         if (attrString) attrString = ` ${attrString}`;
-        str += `<a${attrString}>`;
-        stack.in(name);
+
+        stack.in({
+          name,
+          s: [`<a${attrString}>`],
+        });
         return;
       }
 
@@ -121,29 +154,10 @@ module.exports = function cleanhtml(html) {
         tag = 'p';
       }
 
-      // 处理属性
-      // const attrArr = [];
-      // Object.keys(attr).forEach((key) => {
-      //   key = key.toLowerCase();
-      //   if (key === 'style') {
-      //     // 仅保留color
-      //     let val = attr.style;
-      //     if (/color:.+?;/.test(val)) {
-      //       val = val.match(/color:.+?;/)[0];
-      //       attrArr.push(`style="${val}"`);
-      //     }
-      //   } else {
-      //     attrArr.push(`${key}="${attr[key]}"`);
-      //   }
-      // });
-
-      // if (attrArr.length) {
-      //   str += `<${tag} ${attrArr.join(' ')}>`;
-      //   return;
-      // }
-
-      stack.in(tag);
-      str += `<${tag}>`;
+      stack.in({
+        name: tag,
+        s: [`<${tag}>`],
+      });
     },
 
     onclosetag(name) {
@@ -172,6 +186,7 @@ module.exports = function cleanhtml(html) {
 
       // img 标签
       if (name === 'img') {
+        stack.out();
         return;
       }
 
@@ -181,9 +196,9 @@ module.exports = function cleanhtml(html) {
         tag = 'p';
       }
 
-      stack.out();
-      str += `</${tag}>`;
-      if (tag === 'p') str += '\n';
+      let tmpStr = `</${tag}>`;
+      if (tag === 'p') tmpStr += '\n';
+      stack.out(tmpStr);
     },
 
     ontext(text) {
@@ -196,11 +211,11 @@ module.exports = function cleanhtml(html) {
       if (isHide) return;
 
       text = text.trim();
-      str += text;
+      stack.add(text);
     },
   }, { decodeEntities: false });
 
   parser.end(html);
 
-  return str;
+  return stack.getStr();
 };
