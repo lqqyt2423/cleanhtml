@@ -7,13 +7,13 @@
 ## 安装
 
 ```bash
-npm install cleanhtml --save
+npm install @liqiqiang/cleanhtml --save
 ```
 
 ## 使用
 
 ```javascript
-const cleanhtml = require('cleanhtml');
+const cleanhtml = require('@liqiqiang/cleanhtml');
 
 const html = cleanhtml(rawHtml);
 ```

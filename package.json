@@ -1,5 +1,5 @@
 {
-  "name": "cleanhtml",
+  "name": "@liqiqiang/cleanhtml",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
