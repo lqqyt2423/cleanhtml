@@ -1,18 +1,25 @@
 {
   "name": "cleanhtml",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "node test.js"
+    "test": "node test"
   },
-  "author": "",
+  "author": "liqiqiang",
   "license": "ISC",
   "dependencies": {
     "htmlparser2": "^3.9.2"
   },
   "devDependencies": {
     "request": "^2.87.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lqqyt2423/cleanhtml.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lqqyt2423/cleanhtml/issues"
+  },
+  "homepage": "https://github.com/lqqyt2423/cleanhtml#readme",
+  "description": "清洗凌乱的 html，去除多余的属性、嵌套和所有的行内样式等"
 }
