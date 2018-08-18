@@ -1,7 +1,7 @@
 'use strict';
 
-// 替换为 p 的元素
-const toPElements = ['p', 'div', 'header', 'section', 'article', 'aside', 'footer', 'nav'];
+// 替换为 div 的元素
+const toDivElements = ['header', 'section', 'article', 'aside', 'footer', 'nav'];
 
 const blockElements = [
   'address', 'article', 'aside', 'blockquote', 'body', 'canvas',
@@ -66,9 +66,9 @@ module.exports = function handleNode(node, stack) {
     if (parentNode && parentNode.name === 'strong') return s.join('');
   }
 
-  // 替换块状元素为 p 的元素
+  // 替换块状元素为 div 的元素
   let tag = name;
-  if (toPElements.indexOf(name) > -1) tag = 'p';
+  if (toDivElements.indexOf(name) > -1) tag = 'div';
 
   // 如果子元素都在块状标签内，则忽略此标签
   const x = s.every(str => blockElementsRegExp.test(str));
