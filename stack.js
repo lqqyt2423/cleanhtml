@@ -1,10 +1,8 @@
 'use strict';
 
-const handleNode = require('./handleNode');
-
 // 管理 html 节点信息
 class Stack {
-  constructor() {
+  constructor(converter) {
     // obj
     // {String} name
     // {Object} attr
@@ -12,6 +10,7 @@ class Stack {
     this.stack = [];
     this.s = [];
     this.depth = -1;
+    this.converter = converter;
   }
 
   in(node) {
@@ -23,7 +22,7 @@ class Stack {
     const node = this.stack.pop();
     this.depth -= 1;
 
-    const str = handleNode(node, this);
+    const str = this.converter(node, this);
     if (!str) return;
     if (this.depth === -1) {
       this.s.push(str);

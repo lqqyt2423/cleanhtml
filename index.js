@@ -2,6 +2,13 @@
 
 const htmlparser = require('htmlparser2');
 const Stack = require('./stack');
+const htmlConverter = require('./htmlConverter');
+const textConverter = require('./textConverter');
+
+const converters = {
+  htmlConverter,
+  textConverter,
+};
 
 // 需要忽略的 html 元素
 const voidElements = ['head', 'meta', 'link', 'area', 'base', 'br', 'col', 'command', 'embed', 'input', 'keygen', 'param', 'source', 'track', 'wbr', 'script', 'title', 'style'];
@@ -9,9 +16,16 @@ const voidElements = ['head', 'meta', 'link', 'area', 'base', 'br', 'col', 'comm
 // 忽略标签，不忽略内容
 const toTextElements = ['span', 'html', 'body'];
 
-module.exports = function cleanhtml(html) {
+module.exports = function cleanhtml(html, options = {}) {
+  // mode => html md text
+  const { mode = 'html' } = options;
+  if (['html', 'md', 'text'].indexOf(mode) === -1) throw new Error('mode 仅支持 html, md 和 text');
+  if (mode === 'md') throw new Error('暂未支持 md');
+
+  const converter = converters[`${mode}Converter`];
+
   // 控制 stack
-  const stack = new Stack();
+  const stack = new Stack(converter);
 
   // 控制忽略元素
   const voidObj = {};
@@ -102,9 +116,14 @@ module.exports = function cleanhtml(html) {
       text = text.trim();
       stack.add(text);
     },
-  }, { decodeEntities: false });
+  }, { decodeEntities: mode !== 'html' });
 
   parser.end(html);
 
-  return stack.getStr();
+  let str = stack.getStr();
+  if (mode === 'text') {
+    str = str.replace(/\n{2,}/g, '\n');
+    str = str.trim();
+  }
+  return str;
 };

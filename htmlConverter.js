@@ -1,18 +1,12 @@
 'use strict';
 
+const {
+  blockElements,
+  blockElementsRegExp,
+} = require('./utils');
+
 // 替换为 div 的元素
 const toDivElements = ['header', 'section', 'article', 'aside', 'footer', 'nav'];
-
-const blockElements = [
-  'address', 'article', 'aside', 'blockquote', 'body', 'canvas',
-  'center', 'dir', 'div', 'fieldset', 'figcaption',
-  'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-  'header', 'hgroup', 'hr', 'html', 'isindex', 'main', 'menu', 'nav',
-  'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table',
-  'ul',
-];
-
-const blockElementsRegExp = new RegExp(`^<(${blockElements.join('|')}).*`, 'i');
 
 // 序列化 attr
 const attrStringify = (attr) => {
@@ -38,7 +32,7 @@ const attrStringify = (attr) => {
 // params {Object} node
 // params {Stack} stack
 // returns {String}
-module.exports = function handleNode(node, stack) {
+module.exports = function htmlConverter(node, stack) {
   const { name, attr = {} } = node;
   let { s = [] } = node;
 
